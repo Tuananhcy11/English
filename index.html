@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VocabMaster - Nền Tảng Học Từ Vựng Chuyên Nghiệp</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <header class="app-header">
+        <div class="logo">VocabMaster 🎓</div>
+        <div class="header-nav">
+            <button class="nav-btn active" data-view="dashboard">📚 Bộ chủ đề</button>
+            <button class="nav-btn" data-view="study-view" id="studyNavBtn" style="display: none;">📖 Đang học: <span id="currentDeckTitle"></span></button>
+            <button class="nav-btn" data-view="planner">📅 Lịch học & Nhắc nhở</button>
+        </div>
+    </header>
+
+    <div class="container">
+        <section id="dashboardView" class="view-section active">
+            <div class="section-header">
+                <div>
+                    <h2>Danh sách Bộ từ vựng theo Chủ đề</h2>
+                    <p class="subtext">Chọn một chủ đề để học hoặc nạp file CSV mới</p>
+                </div>
+                <div class="btn-group">
+                    <input type="file" id="csvFileInput" accept=".csv, .txt" style="display: none;">
+                    <button class="btn btn-primary" id="btnCreateDeck">+ Tạo chủ đề mới</button>
+                    <button class="btn btn-outline" id="btnImportCsv">📁 Nạp file CSV</button>
+                </div>
+            </div>
+
+            <div class="deck-grid" id="deckGrid">
+                </div>
+        </section>
+
+        <section id="studyView" class="view-section">
+            <div class="study-header">
+                <button class="btn btn-outline" id="btnBackToDashboard">← Trở về danh sách</button>
+                <h2 id="studyDeckName">Chủ đề học</h2>
+                <button class="btn btn-outline" id="btnShuffle">🔀 Xáo trộn thẻ</button>
+            </div>
+
+            <div class="study-tabs">
+                <button class="study-tab active" data-mode="flashcards">🗂 Thẻ ghi nhớ</button>
+                <button class="study-tab" data-mode="quiz">📝 Trắc nghiệm</button>
+                <button class="study-tab" data-mode="write">✍️ Luyện gõ từ</button>
+            </div>
+
+            <div id="modeFlashcards" class="mode-content active">
+                <div class="card-view">
+                    <div class="flashcard" id="flashcard">
+                        <div class="card-face front">
+                            <span class="card-tag">English</span>
+                            <div class="term-row">
+                                <span class="term-text" id="frontText">...</span>
+                                <button class="audio-btn" id="audioBtn" title="Nghe phát âm (Phím R)">🔊</button>
+                            </div>
+                            <span class="card-hint">Nhấp chuột hoặc phím Space để lật mặt</span>
+                        </div>
+                        <div class="card-face back">
+                            <span class="card-tag">Tiếng Việt</span>
+                            <div class="def-text" id="backText">...</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-controls">
+                    <button class="btn btn-outline" id="btnPrevCard">&#8592; Trước</button>
+                    <span class="progress-indicator" id="cardProgress">1 / 1</span>
+                    <button class="btn btn-outline" id="btnNextCard">Tiếp theo &#8594;</button>
+                </div>
+            </div>
+
+            <div id="modeQuiz" class="mode-content">
+                <div class="quiz-box">
+                    <div class="prompt-meta">
+                        <span class="card-tag">CÂU HỎI TRẮC NGHIỆM</span>
+                        <span id="quizProgress" class="progress-indicator">1 / 1</span>
+                    </div>
+                    <div class="quiz-question-row">
+                        <h3 class="quiz-question" id="quizQuestion"></h3>
+                        <button class="audio-btn" id="quizAudioBtn">🔊</button>
+                    </div>
+                    <div class="quiz-options-grid" id="quizOptions"></div>
+                    <div class="action-right">
+                        <button class="btn btn-primary" id="btnNextQuiz" style="display: none;">Câu tiếp theo &#8594;</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="modeWrite" class="mode-content">
+                <div class="write-box">
+                    <div class="prompt-meta">
+                        <span class="card-tag">NGHĨA TIẾNG VIỆT</span>
+                        <span id="writeProgress" class="progress-indicator">1 / 1</span>
+                    </div>
+                    <h3 class="write-question" id="writeQuestion"></h3>
+                    <input type="text" id="writeInput" class="write-input" placeholder="Gõ từ tiếng Anh tương ứng rồi bấm Enter..." autocomplete="off">
+                    <div id="writeFeedback" class="feedback-box"></div>
+                    <div class="action-row">
+                        <button class="btn btn-outline" id="btnSkipWrite">Chưa nhớ / Xem đáp án</button>
+                        <button class="btn btn-primary" id="btnSubmitWrite">Kiểm tra (Enter)</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="word-list-section">
+                <h3>Danh sách từ trong chủ đề (<span id="totalDeckWords">0</span> từ)</h3>
+                <div id="deckWordsContainer"></div>
+            </div>
+        </section>
+
+        <section id="plannerView" class="view-section">
+            <div class="section-header">
+                <div>
+                    <h2>Lịch học trong tuần & Thông báo nhắc nhở</h2>
+                    <p class="subtext">Lên kế hoạch chủ đề học cho từng ngày và kích hoạt chuông báo học tập</p>
+                </div>
+                <button class="btn btn-primary" id="btnEnableNotification">🔔 Bật thông báo đẩy</button>
+            </div>
+
+            <div class="planner-grid" id="plannerGrid">
+                </div>
+        </section>
+    </div>
+
+    <script src="js/storage.js"></script>
+    <script src="js/audio.js"></script>
+    <script src="js/scheduler.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
